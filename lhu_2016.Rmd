@@ -1,0 +1,35 @@
+---
+title: "Laurel Highlands Ultra Results 2016"
+author: "Daniel Spakowicz"
+date: "3/8/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(xtable)
+```
+
+How long will it take us to run the Laurel Highlands Ultra?
+
+```{r hist, message=FALSE, warning=FALSE}
+df <- read.csv("~/Downloads/lhu_2016.csv")
+
+df$FINISH <- as.difftime(as.character(df$FINISH), format = "%H:%M:%S")
+
+start <- as.POSIXlt("2017-06-10 05:30", "%Y-%m-%d %H:%M", tz = "EST")
+
+ggplot(df) +
+  geom_histogram(aes(start + df$FINISH)) +
+  xlab("Finish Time") +
+  theme_bw()
+
+summary(start + df$FINISH)
+```
+
+Elapsed time:
+```{r elapsed time}
+summary(unclass(df$FINISH))
+```
+
