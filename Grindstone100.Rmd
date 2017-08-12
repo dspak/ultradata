@@ -1,0 +1,64 @@
+---
+title: "Grindstone 100"
+author: "Daniel Spakowicz"
+date: "8/3/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("rvest")
+
+library(rvest)
+library(lubridate)
+```
+
+First I'll read in the previous year's results and format the columns.
+
+```{r}
+# Grindstone 2016 results page 
+# keeps giving 404 error
+url <- "http://apps.eco-xsports.com/reports.php?race=1&year=2016"
+
+x <- read.table("grindstone_2016.tsv", sep = "\t", fill = TRUE, header = TRUE)
+
+times <- hms(x$Time)
+
+asmin <- hour(times)*60 + minute(times) + second(times)/60
+ashour <- asmin/60
+```
+
+```{r}
+hist(ashour)
+```
+
+In the Laurel Highlands Ultra my percentile finish was just over 30. If I apply that here my predicted finish is 
+```{r}
+pred_time <- quantile(ashour, 0.317757)
+pred_time
+```
+
+```{r}
+split <- pred_time * 60 / 100
+split
+```
+
+Dear lord if I shoot for even splits that's 17 min/mile
+
+What time will I reach North River Gap (mile 65.33)? The places where I could pick up Adam are 51, 65 or 81, so I assume he'll want to do 65 and hobble in the last 35 with me.
+
+```{r}
+# Pace is in minutes/mile
+TimeAtMile<- function(mile, pace) {
+  tmp <- mile * pace/60
+  t2 <- 18 + tmp - 24
+  return(t2)
+}
+
+TimeAtMile(65.33, split)
+```
+
+```{r}
+TimeAtMile(80.35, split)
+```
+

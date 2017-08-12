@@ -33,3 +33,24 @@ Elapsed time:
 summary(unclass(df$FINISH))
 ```
 
+Now following up with the results
+
+```{r}
+url <- "http://www.laurelultra.com/results_2017.htm"
+
+x <- xml2::read_html(url)
+y <- html_table(x)[[1]]
+
+time <- as.difftime(as.character(y$FINISH), format = "%H:%M:%S", units = "hour")
+
+```
+
+```{r}
+hist(as.numeric(time))
+
+mytime <- time[grep("Spakowicz", y$NAME)]
+
+sum(time < mytime)/length(time)
+
+```
+
