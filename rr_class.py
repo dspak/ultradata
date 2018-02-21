@@ -1,58 +1,50 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 17 22:10:35 2017
+Created on Wed Feb 21 08:45:04 2018
 
 @author: adam
 """
-import re
+
 import pandas as pd
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 
+class ultraAnalysis():
+    def __init__(self,name,fname):
+        self.name = name
+        self.fname = fname
+        self.predictedFin = None
 
-
-class race_results():
-    def __init__(self,name,fname,data_flag):
-        self.name=name
-        self.fname=fname
+        with open(self.fname,'rb') as fid:
+            self.data=fid.readlines()
         
-        def parse_time1(t):
-            numhour=len(t.split(':')[0])
-            m=re.search(r'(\d{%x}):'%numhour,str(t))
-            if m:
-                return ((int(m.group(1))*60) + int(t[m.start(1)+3:m.start(1)+5])) / 60.0 
-
-  
-        if data_flag== 'csv':
-            data=pd.read_csv(fname,header=None)
-            #identify which column contains timing data.  must have 1 digit followed by ':'
-            timecol='flag'
-            for x in data:
-                m=re.search('(\d{1}):',str(data[x][2]))
-                if m:
-                    timecol=x
-                    self.times=data[timecol].apply(parse_time1)
-                    break
-            if timecol=='flag':
-                self.times='error'
-                print 'couldnt find the data column with time data'
-
-
-            
-            
-        elif data_flag=='txt':
-            with open(fname,'r') as f:
-                data=f.readlines()
-            times=[]
-            for x in data:
-                if x[0].isdigit():
-                    times.append((((int(x.split(':')[0])*60)+(int(x.split(':')[1]))) / 60.0))
-            self.times=times  
+        self.times = self.parseResults()
     
-    def plot_time(self,k):
-        #k=kind of plot
+    def parseResults(self):
+        times=[]
+        for entry in self.data:
+            m=re.search(r'(\d{1,2}):',str(entry))
+            if m:
+                if len(m.group(1))==1:
+                    times.append(((int(m.group(1))*60) + int(entry[m.start(1)+2:m.start(1)+4])) / 60.0)
+                else:
+                    times.append(((int(m.group(1))*60) + int(entry[m.start(1)+3:m.start(1)+5])) / 60.0)
+        return times
+
+    def plotResults(self,k):
+        #k=kind of plot: ['hist','line']
         df=pd.DataFrame(data=sorted(self.times))
         ax=plt.figure()
         ax=df.plot(kind=k,legend=None)
         ax.set_xlabel('total time (hours)')
         ax.set_title('{} total time'.format(self.name))
+    
+    def pFinish(self,p=[25,50,75]):
+        self.predictedFin = np.percentile(self.times,p)
+        print 'predicted finish times:'
+        for xp,yp in zip(p,self.predictedFin):
+            print 'top',xp,'percentile:',yp,'hours.'
+
+
+    
