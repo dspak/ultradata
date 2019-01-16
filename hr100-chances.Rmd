@@ -1,0 +1,73 @@
+---
+title: "hr100 chances"
+author: "Daniel Spakowicz"
+date: "1/15/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+
+```{r change in number of individuals by category}
+x <- read_csv("hr100_odds.csv")
+
+x %>%
+  select(tix:"2019") %>%
+  gather(year, individuals, -tix) %>%
+  ggplot(aes(year, individuals)) +
+  geom_line(aes(group = tix, color = factor(tix)))
+```
+
+```{r}
+x %>%
+  select("tix":"2019") %>%
+  mutate(tix = factor(tix)) %>%
+  map_if(is.numeric, function(y) y / x$`2017`) %>%
+  bind_cols() %>%
+  gather(year, tickets, -tix) %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(year, tickets)) +
+  geom_line(aes(group = tix, color = tix))
+```
+
+
+```{r}
+yrs <- x %>%
+  select("2017":"2019") %>%
+  map(function(y) x$tix * y) %>%
+  bind_cols() %>%
+  gather(year, tickets) %>%
+  mutate(year = as.numeric(year)) %>%
+  group_by(year) %>%
+  summarize(totaltix = sum(tickets)) %>%
+  mutate(data = "actual")
+
+newyear <- seq(2020, 2035)
+
+lm <- lm(totaltix ~ year, data = yrs)
+pred <- data.frame(year = newyear, 
+                   totaltix = predict(lm, newdata = data.frame(year = newyear)),
+                   data = "predicted")
+
+df <- bind_rows(yrs, pred) %>%
+  mutate(mytix = 2^(seq(1, nrow(.))))
+
+df %>%
+  ggplot(aes(x = year)) +
+  geom_point(aes(y = totaltix, color = data)) + 
+  geom_line(aes(y = mytix))
+```
+
+```{r}
+df %>%
+  select(-data) %>%
+  gather(tix, count, -year) %>%
+  ggplot(aes(x = year, y = count)) +
+  geom_line(aes(group = tix, color = tix)) + 
+  theme_bw()
+```
+
