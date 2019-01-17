@@ -71,3 +71,30 @@ df %>%
   theme_bw()
 ```
 
+```{r}
+b <- 1000
+out <- matrix(nrow = length(df$year), ncol = b)
+
+
+for (y in 1:length(df$year)) {
+  for (i in 1:b) {
+    # Create a vector that is the pool of tickets for each year
+    alltix <- c(rep("Me", df$mytix[y]), rep("Someone Else", df$totaltix[y]))
+    # Randomly choose 45
+    chosen <- sample(alltix, 45, replace = FALSE)
+    # Am I in there?
+    out[y, i] <- "Me" %in% chosen
+  }
+}
+
+prob.df <- data.frame(year = df$year, 
+                      prob = rowSums(out) / b)
+
+prob.df %>%
+  ggplot(aes(year, prob)) +
+  geom_line() +
+  theme_bw() +
+  labs(title = "Probability of gaining entry into Hardrock 100")
+
+```
+
