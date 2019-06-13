@@ -80,6 +80,39 @@ cut.times <- start.time + cut.pace
 cut.time <- format(cut.times, format = "%H:%M")
 ```
 
+
+What's my finishing time according to my typical percentile finish?
+
+```{r}
+res <- read.csv("2018_results.csv", stringsAsFactors = FALSE) %>%
+  filter(distance == 100) %>%
+  mutate(time = hms(time)) %>%
+  drop_na(time)
+  
+typical.percentile <- .63
+
+time <- nrow(res) * (1 - typical.percentile)
+
+mytime <- res$time[time]
+mytime
+```
+
+Now I'll add my estimated splits to the pacing chart. 
+
+```{r}
+my.per.mile <- seconds_to_period (as.numeric(mytime) / 100.5 ) %>%
+  ceiling
+
+my.per.mile
+
+my.pace <- seconds(as.numeric(my.per.mile) * df$Total.Distance) %>%
+  seconds_to_period() %>%
+  round
+
+my.times <- format(start.time + my.pace, format = "%H:%M")
+```
+
+
 Add in desired clumns to dataframe and remove undesired. 
 
 ```{r}
@@ -87,8 +120,9 @@ out <-
   df %>%
   mutate(cut.pace = x$total.time) %>%
   mutate(cut.time = cut.time) %>%
+  mutate(my.time = my.times) %>%
   select(-Aid.Station.Open.Close, -Section.Elevation.Change..ft., -Total.Ascent..ft., -Total.Decent..ft.) %>%
-  select(Aid.Station, Section.Distance, Total.Distance, cut.pace, cut.time, Section.Ascent, Section.Decent..ft., Crew.Access, Drop.Bag)
+  select(Aid.Station, Section.Distance, Total.Distance, cut.pace, cut.time, my.time, Section.Ascent, Section.Decent..ft., Crew.Access, Drop.Bag)
 
 kable(out)
 ```
