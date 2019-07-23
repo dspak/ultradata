@@ -1,0 +1,35 @@
+---
+title: "BR100_2019"
+author: "Daniel Spakowicz"
+date: "7/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+```{r read in data}
+df <- read_csv("2019_aid.csv")
+```
+
+
+```{r cars}
+ly <- hms("26:18:12")
+
+ly.dec <- as.numeric(ly) / 101.3 / 60
+
+secs <- (ly.dec - floor(ly.dec)) * 60
+
+ly.pace <- ms(paste(floor(ly.dec), secs, sep = ":"))
+
+start <- as.POSIXct("2019-07-27 04:00:00", tz = "EST")
+
+df <-
+  df %>%
+  mutate(ly.total  =  (as.numeric(ly.pace) * df$total.dist)) %>%
+  mutate(ly.total = ly.total + start) %>%
+  mutate(ly.total = format(ly.total, "%H:%M:%S"))
+```
