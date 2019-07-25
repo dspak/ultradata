@@ -1,0 +1,24 @@
+aid,Name,leg.dist,total.dist,terrain.to.next,drop,cutoff,ly.total
+A,Start,0,0,"50% Paved, 50% Bridle Trail",yes,04:00:00,04:00:00
+B,Memorial,4.8,4.8,"30% Towpath, 30% Bridle Trail, 40% Single Track",no,05:26:00,05:14:46
+C,North Hawkins,4.7,9.5,"45% Towpath, 55% Single Track",no,06:50:00,06:28:00
+D,Botzum,5.9,15.4,"40% Paved, 10% Towpath, 50% Single Track",no,08:38:00,07:59:55
+E,O'Neil Woods,1.6,17.1,"35% Paved, 10% Towpath, 55% Single Track",no,09:08:00,08:26:24
+F,Oakhill,5.2,22.2,"40% Bridle Trail, 60% Single Track",yes,10:42:00,09:45:51
+G,Valley Picnic,4.4,26.6,"10% Paved, 40% Towpath, 50% Bridle Trail",no,12:01:00,10:54:24
+H,Robinson Field,3.7,30.3,100% Bridle Trail,no,13:04:00,11:52:03
+I,Pine Hollow,4.1,34.4,"20% Bridle Trail, 80% Single Track",yes,14:17:00,12:55:56
+J,Kendall Lake Shelter,5.8,40.2,"10% Paved, 40% Bridle Trail, 60% Single Track",no,15:38:00,14:26:17
+K,303 Hike & Bike,4.5,44.7,"90% Paved, 5%Towpath, 5% Single Track",no,17:01:00,15:36:24
+L,Springs,6.5,51.2,"90% Paved, 5% Towpath, 5% single track",yes,19:00:00,17:17:40
+K2,303 Hike & Bike,6.5,57.7,"10% Paved, 40% Bridle Trail, 60% Single Track",no,20:58:00,18:58:56
+J2,Kendall Lake Shelter,4.5,62.2,"20% Bridle Trail, 80% Single Track",no,22:21:00,20:09:02
+I2,Pine Hollow,5.8,68,100% Bridle Trail,yes,23:42:00,21:39:24
+H2,Robinson Field,4.1,72.1,"10% Paved, 40% Towpath, 50% Bridle Trail",no,00:55:00,22:43:16
+G2,Valley Picnic,75.8,3.7,"40% Bridal Trail, 60% Single Track",no,01:58:00,04:57:38
+F2,Oakhill,4.4,80.1,"35% Paved, 10% Towpath, 55% Single Track",yes,03:17:00,00:47:54
+E2,O'Neil Woods,5.2,85.3,"40% Paved, 10% Towpath, 50% Single Track",no,04:51:00,02:08:55
+D2,Botzum,1.6,86.9,"45% Towpath, 55% Single Track",yes,05:21:00,02:33:51
+C2,North Hawkins,5.9,92.8,"30% Towpath, 30% Bridle Trail, 40% Single Track",no,07:09:00,04:05:46
+B2,Memorial,4.7,97.5,"50% Paved, 50% Bridle Trail",yes,08:33:00,05:18:59
+A2,HiHo Brewing,4.8,102.3,NA,yes,10:00:00,06:33:46

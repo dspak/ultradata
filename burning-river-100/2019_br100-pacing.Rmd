@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(lubridate)
 ```
 
 ```{r read in data}
@@ -31,5 +32,8 @@ df <-
   df %>%
   mutate(ly.total  =  (as.numeric(ly.pace) * df$total.dist)) %>%
   mutate(ly.total = ly.total + start) %>%
-  mutate(ly.total = format(ly.total, "%H:%M:%S"))
+  mutate(ly.total = format(ly.total, "%H:%M:%S")) %>%
+  rename("aid" = "X1")
+
+write_csv(df, "pace-chart.csv")
 ```
