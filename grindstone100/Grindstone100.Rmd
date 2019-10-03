@@ -44,7 +44,7 @@ split <- pred_time * 60 / 100
 split
 ```
 
-Dear lord if I shoot for even splits that's 17 min/mile
+Even splits are 17 min/mile.
 
 What time will I reach North River Gap (mile 65.33)? The places where I could pick up Adam are 51, 65 or 81, so I assume he'll want to do 65 and hobble in the last 35 with me.
 
@@ -91,7 +91,7 @@ x$"19min/mile pace" <- time_at_aid(start.time, x$Mileage, 19)
 x$"20min/mile pace" <- time_at_aid(start.time, x$Mileage, 20)
 
 # Reformat the cutoff column to unify it
-x$`38-Hour Cutoff` <- strptime(x$`38-Hour Cutoff`, format = "%R %p")
+x$`38-Hour Cutoff` <- strptime(x$`38-Hour Cutoff`, format = "%I:%M %p")
 x$`38 hour cutoff` <- format(x$`38-Hour Cutoff`,"%H:%M")
 
 y <- x
