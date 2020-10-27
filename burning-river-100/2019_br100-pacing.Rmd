@@ -13,27 +13,73 @@ library(lubridate)
 ```
 
 ```{r read in data}
-df <- read_csv("2019_aid.csv")
+df <- read_csv("2019_aid.csv") %>%
+    rename("aid" = "X1")
+```
+
+```{r}
+# Start time, wave 20
+start <- as.POSIXct("2020-08-22 04:57:00", tz = "EST")
+
+# Fix cutoff times
+format(df$cutoff + min(57), "%H:%M:%S")
+
+
+distances <- c(0.0, 4.5, 9.1, 13.0, 14.6, 16.4, 21.6, 25.9, 29.5, 33.6, 39.4, 44.9, 50.2, 55.6, 
+               61.1, 66.9, 71.0, 74.6, 78.9, 84.0, 85.8, 87.4, 91.3, 95.9, 100.2)
+
+plot(distances)
+
+goaltimes <- start + (as.numeric(goal) * distances)
+goaltimes
 ```
 
 
-```{r cars}
+```{r}
+# Last year's time
 ly <- hms("26:18:12")
 
-ly.dec <- as.numeric(ly) / 101.3 / 60
 
-secs <- (ly.dec - floor(ly.dec)) * 60
+# Goal time
+goal <- hms("24:00:00")
 
-ly.pace <- ms(paste(floor(ly.dec), secs, sep = ":"))
 
-start <- as.POSIXct("2019-07-27 04:00:00", tz = "EST")
 
-df <-
-  df %>%
-  mutate(ly.total  =  (as.numeric(ly.pace) * df$total.dist)) %>%
-  mutate(ly.total = ly.total + start) %>%
-  mutate(ly.total = format(ly.total, "%H:%M:%S")) %>%
-  rename("aid" = "X1")
+getPace <- function(time) {
+  dec <- as.numeric(time) / 101.3 / 60
 
-write_csv(df, "pace-chart.csv")
+  secs <- (dec - floor(dec)) * 60
+
+  pace <- ms(paste(floor(dec), secs, sep = ":"))
+  
+  return(pace)  
+}
+
+ly <- getPace(ly)
+goal <- getPace(goal)
+```
+
+
+
+Create data frame with last year's pace
+
+```{r}
+lytimes <- start + (as.numeric(ly) * df$total.dist)
+
+goaltimes <- start + (as.numeric(goal) * df$total.dist)
+
+```
+
+
+```{r}
+get.it <- 
+  df %>% 
+  mutate(ly.times = format(lytimes, "%H:%M:%S"),
+         goal.times = format(goaltimes, "%H:%M:%S")
+  )
+```
+
+```{r}
+write_csv(x = get.it, 
+          path = paste0(format(Sys.Date(), "%F"), "_pace-chart.csv"))
 ```
