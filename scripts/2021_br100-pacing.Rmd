@@ -1,0 +1,100 @@
+---
+title: "BR100_2021"
+author: "Daniel Spakowicz"
+date: "7/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(lubridate)
+library(readxl)
+```
+
+```{r read in data}
+df <- read_xlsx("../data/burning-river-100/2021_burning-river100_aid.xlsx") %>%
+  mutate(clock.time = format(close, "%H:%M"))
+```
+
+
+
+```{r}
+start.time <- as.POSIXct("2021-07-24 04:00:00")
+
+# Goal time
+goal <- hms("28:00:00")
+
+
+getPace <- function(time, total.miles) {
+  dec <- as.numeric(time) / total.miles / 60
+
+  secs <- (dec - floor(dec)) * 60
+
+  pace <- ms(paste(floor(dec), secs, sep = ":"))
+  
+  
+  return(pace)  
+}
+
+total.miles <- df$total.dist[nrow(df)]
+
+goal <- getPace(goal, total.miles)
+```
+
+Create a vector of the goal gun time.
+
+```{r}
+goal.pace <- goal
+distances.vector <- df$total.dist
+
+getGunTime <- function(goal.pace, distances.vector) {
+  
+  gun.times.df <- data.frame(
+    num = as.numeric(goal.pace) * distances.vector
+  )
+  
+  tmp <- 
+    gun.times.df %>%
+    mutate(hr.frac = num/60/60,
+           hr = floor(hr.frac),
+           min = round((hr.frac - hr) * 60),
+           min00 = gsub("^(\\d{1})$", "0\\1", min),
+           h.m = paste(hr, min00, sep = ":")
+           ) %>%
+    select(h.m) %>%
+    as.vector
+}
+
+gun.time <- getGunTime(goal.pace = goal,
+                       distances.vector = df$total.dist)
+```
+
+Create a vector of the goal pace clock time.
+
+```{r}
+goal.clock <- start.time + (as.numeric(goal) * df$total.dist)
+
+get.it <- 
+  df %>% 
+  mutate(
+    goal.clock = format(goal.clock, "%H:%M:%S"),
+    goal.gun = gun.time
+  )
+
+```
+
+Write the output to a spreadsheet.
+
+```{r}
+write_csv(get.it, 
+          file = file.path("..", "data", "burning-river-100", 
+                           paste0(format(Sys.Date(), "%F"), 
+                                  "br_pace-chart.csv")
+          )
+)
+```
+
+
+
