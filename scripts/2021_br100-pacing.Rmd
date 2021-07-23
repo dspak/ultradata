@@ -62,13 +62,14 @@ getGunTime <- function(goal.pace, distances.vector) {
            min = round((hr.frac - hr) * 60),
            min00 = gsub("^(\\d{1})$", "0\\1", min),
            h.m = paste(hr, min00, sep = ":")
-           ) %>%
-    select(h.m) %>%
-    as.vector
+           )
+  return(tmp$h.m)
 }
 
 gun.time <- getGunTime(goal.pace = goal,
                        distances.vector = df$total.dist)
+
+gun.time
 ```
 
 Create a vector of the goal pace clock time.
@@ -91,7 +92,7 @@ Write the output to a spreadsheet.
 write_csv(get.it, 
           file = file.path("..", "data", "burning-river-100", 
                            paste0(format(Sys.Date(), "%F"), 
-                                  "br_pace-chart.csv")
+                                  "_br_pace-chart.csv")
           )
 )
 ```

@@ -394,13 +394,17 @@ getGunTime &lt;- function(goal.pace, distances.vector) {
            min = round((hr.frac - hr) * 60),
            min00 = gsub(&quot;^(\\d{1})$&quot;, &quot;0\\1&quot;, min),
            h.m = paste(hr, min00, sep = &quot;:&quot;)
-           ) %&gt;%
-    select(h.m) %&gt;%
-    as.vector
+           )
+  return(tmp$h.m)
 }
 
 gun.time &lt;- getGunTime(goal.pace = goal,
-                       distances.vector = df$total.dist)</code></pre>
+                       distances.vector = df$total.dist)
+
+gun.time</code></pre>
+<pre><code>##  [1] &quot;0:00&quot;  &quot;1:32&quot;  &quot;2:47&quot;  &quot;3:48&quot;  &quot;4:16&quot;  &quot;5:35&quot;  &quot;6:36&quot;  &quot;7:38&quot;  &quot;8:38&quot; 
+## [10] &quot;9:44&quot;  &quot;11:21&quot; &quot;12:29&quot; &quot;14:01&quot; &quot;15:31&quot; &quot;16:39&quot; &quot;18:16&quot; &quot;19:22&quot; &quot;20:22&quot;
+## [19] &quot;21:24&quot; &quot;22:25&quot; &quot;23:44&quot; &quot;24:12&quot; &quot;25:13&quot; &quot;26:28&quot; &quot;27:60&quot;</code></pre>
 <p>Create a vector of the goal pace clock time.</p>
 <pre class="r"><code>goal.clock &lt;- start.time + (as.numeric(goal) * df$total.dist)
 
@@ -414,7 +418,7 @@ get.it &lt;-
 <pre class="r"><code>write_csv(get.it, 
           file = file.path(&quot;..&quot;, &quot;data&quot;, &quot;burning-river-100&quot;, 
                            paste0(format(Sys.Date(), &quot;%F&quot;), 
-                                  &quot;br_pace-chart.csv&quot;)
+                                  &quot;_br_pace-chart.csv&quot;)
           )
 )</code></pre>
 
