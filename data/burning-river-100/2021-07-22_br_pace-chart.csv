@@ -1,0 +1,26 @@
+letter,station,leg.dist,total.dist,type,crew,drop,pacer,cut.clock,goal.clock,goal.gun
+A,High Bridge Glens,0,0,None,,,,07:00,04:00:00,0:00
+B,Memorial,5.5,5.5,Fluids,,,,08:12,05:31:34,1:32
+C,North Hawkins,4.5,10,Full,YES,,,09:23,06:46:30,2:47
+D,Mingo Shelter,3.7,13.7,Full,,,,10:22,07:48:06,3:48
+E,Botzum,1.7,15.399999999999999,Full,YES,,,10:50,08:16:24,4:16
+F,Indigo Lake,4.7,20.099999999999998,Fluids,,,,11:19,09:34:40,5:35
+G,Oakhill,3.7,23.799999999999997,Full,YES,YES,,13:02,10:36:16,6:36
+H,Valley Picnic,3.7,27.499999999999996,Full,,,,14:06,11:37:52,7:38
+I,Robinson Field,3.6,31.099999999999998,Fluids,,,,15:08,12:37:49,8:38
+J,Pine Hollow,4,35.099999999999994,Full,YES,YES,,16:12,13:44:25,9:44
+K,Kendall Lake,5.8,40.89999999999999,Full,,,,17:46,15:20:59,11:21
+L,Old Rt. 8 (Tiki),4.1,44.99999999999999,Full,,,,19:04,16:29:15,12:29
+M,Silver Springs,5.5,50.49999999999999,Full,YES,YES,YES,21:00,18:00:49,14:01
+L,Old Rt. 8 (Tiki),5.4,55.89999999999999,Full,,,,21:55,19:30:44,15:31
+K,Kendall Lake Shelter,4.1,59.99999999999999,Full,,,,23:13,20:39:00,16:39
+J,Pine Hollow,5.8,65.8,Full,YES,YES,YES,00:47,22:15:34,18:16
+I,Robinson Field,4,69.8,Full,,,,01:51,23:22:10,19:22
+H,Valley Picnic,3.6,73.39999999999999,Full,,,,02:53,00:22:07,20:22
+G,Oakhill,3.7,77.1,Full,YES,YES,YES,03:57,01:23:43,21:24
+F,Indigo Lake,3.7,80.8,Fluids,,,,05:40,02:25:19,22:25
+E,Botzum,4.7,85.5,Full,YES,,YES,06:09,03:43:35,23:44
+D,Mingo Shelter,1.7,87.2,Full,,,,06:37,04:11:53,24:12
+C,North Hawkins,3.7,90.9,Full,YES,,YES,07:36,05:13:29,25:13
+B,Memorial,4.5,95.4,Full,YES,,YES,08:47,06:28:25,26:28
+A,High Bridge Glens,5.5,100.9,Full,YES,,,10:00,08:00:00,27:60

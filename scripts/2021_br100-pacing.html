@@ -356,7 +356,8 @@ pre code {
 
 
 <pre class="r"><code>df &lt;- read_xlsx(&quot;../data/burning-river-100/2021_burning-river100_aid.xlsx&quot;) %&gt;%
-  mutate(clock.time = format(close, &quot;%H:%M&quot;))</code></pre>
+  mutate(cut.clock = format(close, &quot;%H:%M&quot;)) %&gt;%
+  select(-close)</code></pre>
 <pre class="r"><code>start.time &lt;- as.POSIXct(&quot;2021-07-24 04:00:00&quot;)
 
 # Goal time
@@ -408,12 +409,19 @@ gun.time</code></pre>
 <p>Create a vector of the goal pace clock time.</p>
 <pre class="r"><code>goal.clock &lt;- start.time + (as.numeric(goal) * df$total.dist)
 
+naBlank &lt;- function(x) {
+  if_else(is.na(x),
+          true = &quot;&quot;,
+          false = x)
+}
+
 get.it &lt;- 
   df %&gt;% 
   mutate(
     goal.clock = format(goal.clock, &quot;%H:%M:%S&quot;),
     goal.gun = gun.time
-  )</code></pre>
+  ) %&gt;%
+  mutate_at(c(&quot;crew&quot;, &quot;drop&quot;, &quot;pacer&quot;), naBlank)</code></pre>
 <p>Write the output to a spreadsheet.</p>
 <pre class="r"><code>write_csv(get.it, 
           file = file.path(&quot;..&quot;, &quot;data&quot;, &quot;burning-river-100&quot;, 

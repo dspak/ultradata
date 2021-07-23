@@ -15,7 +15,8 @@ library(readxl)
 
 ```{r read in data}
 df <- read_xlsx("../data/burning-river-100/2021_burning-river100_aid.xlsx") %>%
-  mutate(clock.time = format(close, "%H:%M"))
+  mutate(cut.clock = format(close, "%H:%M")) %>%
+  select(-close)
 ```
 
 
@@ -77,12 +78,19 @@ Create a vector of the goal pace clock time.
 ```{r}
 goal.clock <- start.time + (as.numeric(goal) * df$total.dist)
 
+naBlank <- function(x) {
+  if_else(is.na(x),
+          true = "",
+          false = x)
+}
+
 get.it <- 
   df %>% 
   mutate(
     goal.clock = format(goal.clock, "%H:%M:%S"),
     goal.gun = gun.time
-  )
+  ) %>%
+  mutate_at(c("crew", "drop", "pacer"), naBlank)
 
 ```
 
