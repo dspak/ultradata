@@ -1,0 +1,203 @@
+---
+title: "Grindstone 100"
+author: "Daniel Spakowicz"
+date: "8/3/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("rvest")
+
+library(rvest)
+library(lubridate)
+library(dplyr)
+```
+
+First I'll read in the previous year's results and format the columns.
+
+```{r}
+# Grindstone 2016 results page 
+# keeps giving 404 error
+url <- "http://apps.eco-xsports.com/reports.php?race=1&year=2016"
+
+x <- read.table("../data/grindstone100/grindstone_2016.tsv", sep = "\t", fill = TRUE, header = TRUE)
+
+times <- hms(x$Time)
+
+asmin <- hour(times)*60 + minute(times) + second(times)/60
+as.hour <- asmin/60
+```
+
+```{r}
+hist(as.hour)
+abline(v = median(as.hour))
+```
+
+In the Laurel Highlands Ultra my percentile finish was just over 30. If I apply that here my predicted finish is 
+```{r}
+pred_time <- quantile(as.hour, 0.317757)
+pred_time
+```
+
+```{r}
+split <- pred_time * 60 / 100
+split
+```
+
+Even splits are 17 min/mile.
+
+What time will I reach North River Gap (mile 65.33)? The places where I could pick up Adam are 51, 65 or 81, so I assume he'll want to do 65 and hobble in the last 35 with me.
+
+```{r}
+# Pace is in minutes/mile
+TimeAtMile <- function(mile, pace) {
+  tmp <- mile * pace/60
+  t2 <- 18 + tmp - 24
+  return(t2)
+}
+
+TimeAtMile(65.33, split)
+```
+
+```{r}
+TimeAtMile(80.35, split)
+```
+
+```{r}
+TimeAtMile(22.11, split)
+```
+
+```{r}
+x <- read.table("../data/grindstone100/grindstone-aid-stations.txt", sep = "\t")
+
+header <- c("#", "Aid Station Name", "Location", "Seg Distance", "Mileage", "Crew Access", "Drop Bags", "Record Pace", "20 Hour Time", "Last Runner", "38-Hour Cutoff", "Elevation", "lat", "lng")
+
+names(x) <- header
+
+
+
+start.time <- as.POSIXct("2021-09-17 17:40", tz = "EST", format = "%F %R")
+
+time_at_aid <- function(start.time, aid.locations, min.mile) {
+  duration <- aid.locations * min.mile
+  secs <- round(duration * 60, 0)
+  out <- format(start.time + secs, "%H:%M")
+  return(out)
+}
+
+```
+
+
+
+# Pacing for different total times
+
+```{r}
+getPace <- function(time, total.miles) {
+  dec <- as.numeric(time) / total.miles / 60
+
+  secs <- (dec - floor(dec)) * 60
+
+  pace <- ms(paste(floor(dec), secs, sep = ":"))
+  
+  
+  return(pace)  
+}
+
+# Goal time
+goal30 <- hms("30:00:00")
+goal32 <- hms("32:00:00")
+cutpace <- hms("38:00:00")
+
+pace.30 <- getPace(goal30, 101.85)
+pace.32 <- getPace(goal32, 101.85)
+pace.38 <- getPace(cutpace, 101.85)
+```
+
+```{r}
+x <- 
+  x %>%
+  mutate("15min/mile pace" = time_at_aid(start.time, x$Mileage, 15),
+         "17min/mile pace" = time_at_aid(start.time, x$Mileage, split),
+         "17min 40sec"     = time_at_aid(start.time, x$Mileage, 17.6666), 
+         "19min/mile pace" = time_at_aid(start.time, x$Mileage, 19),
+         "20min/mile pace" = time_at_aid(start.time, x$Mileage, 20)
+  )
+
+
+
+# Reformat the cutoff column to unify it
+x$`38-Hour Cutoff` <- strptime(x$`38-Hour Cutoff`, format = "%I:%M %p")
+x$`38 hour cutoff` <- format(x$`38-Hour Cutoff`,"%H:%M")
+```
+
+
+```{r}
+goal.pace <- pace.30
+distances.vector <- x$Mileage
+
+getGunTime <- function(goal.pace) {
+  
+  gun.times.df <- data.frame(
+    num = as.numeric(goal.pace) * x$Mileage
+  )
+  
+  tmp <- 
+    gun.times.df %>%
+    mutate(hr.frac = num/60/60,
+           hr = floor(hr.frac),
+           min = round((hr.frac - hr) * 60),
+           min00 = gsub("^(\\d{1})$", "0\\1", min),
+           h.m = paste(hr, min00, sep = ":")
+           )
+  return(tmp$h.m)
+}
+
+gun.time <- getGunTime(goal.pace = pace.30)
+
+gun.time
+```
+
+
+```{r}
+
+x <- 
+  x %>%
+  mutate("30hr.pace" = getGunTime(pace.30),
+         "32hr.pace" = getGunTime(pace.32),
+         "38hr.pace" = getGunTime(pace.38) 
+  )
+```
+
+
+```{r}
+# y <- 
+#   x %>%
+#   select(-c(`#`, `Record Pace`, `lat`, `lng`, `Last Runner`, `20 Hour Time`, `38-Hour Cutoff`))
+         
+y <- 
+  x %>%
+  select(`Aid Station Name`, `Seg Distance`, Mileage, `Crew Access`, Elevation, `30hr.pace`, `32hr.pace`, `38hr.pace`)
+
+
+write.csv(x = y, 
+          file = file.path("..", "data", "grindstone100", 
+                           paste0(format(Sys.Date(), "%Y"), 
+                                  "_grindstone-pacing.csv")
+          ),
+          row.names = FALSE,
+)
+
+```
+
+
+```{r}
+write.csv(x = x, 
+          file = file.path("..", "data", "grindstone100", 
+                           paste0(format(Sys.Date(), "%Y"), 
+                                  "_all-data-for-dad_grindstone.csv")
+          ),
+          row.names = FALSE,
+)
+```
+
