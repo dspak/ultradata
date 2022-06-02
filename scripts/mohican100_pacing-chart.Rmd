@@ -73,7 +73,7 @@ x <-
 Create a time of day for cut pace at all aid stations.
 
 ```{r}
-start.time <- ymd_hms("2021-06-19 5:00:00")
+start.time <- ymd_hms("2022-06-04 5:00:00")
 
 cut.times <- start.time + cut.pace
 
@@ -84,12 +84,12 @@ cut.time <- format(cut.times, format = "%H:%M")
 What's my finishing time according to my typical percentile finish?
 
 ```{r}
-res <- read.csv("../data/mohican100_2018_results.csv", stringsAsFactors = FALSE) %>%
+res <- read.csv("../data/mohican100/mohican100_2018_results.csv", stringsAsFactors = FALSE) %>%
   filter(distance == 100) %>%
   mutate(time = hms(time)) %>%
   drop_na(time)
   
-typical.percentile <- 9
+typical.percentile <- 0.75
 
 time <- nrow(res) * typical.percentile
 
@@ -128,6 +128,6 @@ kable(out)
 ```
 
 ```{r}
-write.csv(out, file = paste0("../data/", format(Sys.Date(), "%Y"),"_mohican-100_pacing-chart.csv"), row.names = FALSE)
+write.csv(out, file = paste0("../data/mohican100/", format(Sys.Date(), "%Y"),"_mohican-100_pacing-chart.csv"), row.names = FALSE)
 ```
 
