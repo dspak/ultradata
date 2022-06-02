@@ -20,7 +20,7 @@ I find it comforting to know how I'm doing relative to the cutoff times at all p
 ```{r}
 cutoff <- as.numeric(hms("32:00:00"))
 
-pace.for.cutoff <- seconds_to_period (cutoff / 100.5 ) %>%
+pace.for.cutoff <- seconds_to_period (cutoff / 100.2 ) %>%
   ceiling
 
 pace.for.cutoff
@@ -39,7 +39,7 @@ min.at.aid
 95 minutes at aid. After accounting for aid station time my average pace must be:
 
 ```{r}
-s <- ( cutoff - (min.at.aid * 60) ) / 100.5
+s <- ( cutoff - (min.at.aid * 60) ) / 100.2
 
 seconds_to_period(s) %>%
   ceiling
@@ -48,7 +48,7 @@ seconds_to_period(s) %>%
 18 min 10 sec per mile. 
 
 ```{r}
-df <- read.csv("../data/race_data.csv")
+df <- read.csv("../data/mohican100/race_data.csv")
 
 cut.pace <- seconds(as.numeric(pace.for.cutoff) * df$Total.Distance) %>%
   seconds_to_period() %>%
@@ -121,13 +121,91 @@ out <-
   mutate(cut.pace = x$total.time) %>%
   mutate(cut.time = cut.time) %>%
   mutate(my.time = my.times) %>%
-  select(-Aid.Station.Open.Close, -Section.Elevation.Change..ft., -Total.Ascent..ft., -Total.Decent..ft.) %>%
-  select(Aid.Station, Section.Distance, Total.Distance, cut.pace, cut.time, my.time, Section.Ascent, Section.Decent..ft., Crew.Access, Drop.Bag)
+  select(-Aid.Station.Open.Close, 
+         -Section.Elevation.Change..ft., 
+         -Total.Ascent..ft., 
+         -Total.Decent..ft.) %>%
+  select(Aid.Station, 
+         Section.Distance, 
+         Total.Distance, 
+         cut.pace, 
+         cut.time, 
+         my.time, 
+         Section.Ascent, 
+         Section.Decent..ft.,
+         Crew.Access, 
+         Drop.Bag) %>%
+  rename("Section.Descent" = "Section.Decent..ft.")
 
-kable(out)
 ```
 
 ```{r}
-write.csv(out, file = paste0("../data/mohican100/", format(Sys.Date(), "%Y"),"_mohican-100_pacing-chart.csv"), row.names = FALSE)
+new <- read_csv("../data/mohican100/Mohican Pace Chart 2022 - 100.csv",
+         skip = 2) %>%
+  filter(!is.na(`Section Distance`))
+
+head(new)
+```
+
+```{r}
+
+naToZero <- function(x) {
+  if_else(is.na(x), 0, x)
+}
+
+new.2 <- 
+  new %>%
+  mutate(across(c(`Section Distance`, `Total Distance`),
+                as.numeric)
+         ) %>%
+  mutate(across(c(`Section Distance`, `Total Distance`),
+                naToZero))
+                
+
+new.pace <- seconds(as.numeric(my.per.mile) * new.2$`Total Distance`) %>%
+  seconds_to_period() %>%
+  round
+
+new.times <- format(start.time + new.pace, format = "%H:%M")
+```
+
+```{r}
+
+cut.pace <- seconds(as.numeric(pace.for.cutoff) * new.2$`Total Distance`) %>%
+  seconds_to_period() %>%
+  round
+
+cut.pace
+```
+
+Reformat cut pace to remove the day period
+
+```{r}
+reformatPacing <- function(period) {
+  data.frame(total = period,
+             days = day(period),
+             hours = hour(period),
+             minutes = minute(period),
+             seconds = second(period)) %>%
+  mutate(hr.total = days * 24 + hours) %>%
+  mutate(total.time = paste(hr.total, minutes, seconds, sep = ":")) %>%
+  pull(total.time)
+}
+
+cut.pace.ref <- reformatPacing(cut.pace)
+new.pace.ref <- reformatPacing(new.pace)
+
+
+out2 <- 
+  new.2 %>%
+  mutate(cut.pace = cut.pace.ref) %>%
+  mutate(cut.time = cut.time) %>%
+  mutate(my.time = new.times) %>%
+  mutate(my.pace = new.pace.ref)
+
+```
+
+```{r}
+write.csv(out2, file = paste0("../data/mohican100/", format(Sys.Date(), "%Y"),"_mohican-100_pacing-chart.csv"), row.names = FALSE)
 ```
 
