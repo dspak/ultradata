@@ -1,0 +1,51 @@
+---
+title: "UTMB_Puerto-Vallarta_100"
+author: "Dan Spakowicz"
+date: "2022-09-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readxl)
+library(tidyverse)
+library(lubridate)
+```
+
+```{r}
+x <- readxl::read_xlsx(
+  "../data/utmb_puerto-vallarta100/PuertoVallartaUTMB20220818.xlsx",
+  sheet = 1, 
+  skip = 1
+)
+
+summary(x)
+```
+Convert distances and elevations.
+
+```{r}
+xc <- 
+  x %>%
+  mutate(altitude.feet = `Altitude meters` * 3.28084,
+         distance.int.mi = `Distance Interval km` * 0.621371,
+         total.dist.mi = `Total Distance km` * 0.621371,
+         elev.gain.tot.ft = Elevation...5 * 3.28084,
+         elev.desc.tot.ft = Elevation...6 * 3.28084)
+
+summary(xc)
+```
+
+Correct times.
+
+```{r}
+xc %>%
+  mutate(cutoff = lubridate::with_tz(`Cut-off`, tz = "CDT"))
+
+```
+
+
+```{r}
+  select(Point, altitude.feet, distance.int.mi, total.dist.mi, elev.gain.tot.ft, elev.desc.tot.ft, 
+```
+
