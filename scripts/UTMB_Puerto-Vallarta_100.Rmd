@@ -39,13 +39,68 @@ summary(xc)
 Correct times.
 
 ```{r}
-xc %>%
-  mutate(cutoff = lubridate::with_tz(`Cut-off`, tz = "CDT"))
+# Create function to convert times from pace per mile
+secPerMileToHMS <- function(sec.per.mile, distances) {
+  
+  tmp <- data.frame(sec.elapsed = sec.per.mile * distances) %>%
+    mutate(hoursdec = sec.elapsed / 60 / 60,
+           hours = floor(hoursdec),
+           mindec = (hoursdec - hours) * 60,
+           min = floor(mindec),
+           minpad = str_pad(min, 2, pad = "0"),
+           sec = round((mindec-min)*60, 0),
+           secpad = str_pad(sec, 2, pad = "0"),
+           hms = paste(hours, minpad, secpad, sep = ":"))
+  
+  return(tmp$hms) %>%
+    as.vector
+}
+
+
+starttime <- as.POSIXct("2022-10-28 18:00", tz = "America/Chicago")
+
+cutoff <- as.POSIXct("2022-10-30 14:30", tz = "America/Chicago")
+
+total.sec <- as.numeric((cutoff - starttime)) * 24 * 60 * 60
+
+cutoff.per.mile.sec <- total.sec / xc$total.dist.mi[nrow(xc)]
+
+
+# 17 min 40 sec per mile from Grindstone
+pace.per.mile.sec <- 17*60 + 40
+
+xct <- 
+  xc %>%
+  mutate(cut.elapsed = secPerMileToHMS(cutoff.per.mile.sec, total.dist.mi),
+         pace.elapsed = secPerMileToHMS(pace.per.mile.sec, total.dist.mi),
+         cut.time = format(hms(cut.elapsed) + starttime, "%H:%M:%S"),
+         pace.time = format(hms(pace.elapsed) + starttime, "%H:%M:%S"),
+         `Cut-off` = format(`Cut-off`, "%H:%M:%S"))
 
 ```
 
 
+
 ```{r}
-  select(Point, altitude.feet, distance.int.mi, total.dist.mi, elev.gain.tot.ft, elev.desc.tot.ft, 
+out <- 
+  xct %>%
+  select(Point, 
+         altitude.feet, 
+         distance.int.mi, 
+         total.dist.mi, 
+         elev.gain.tot.ft, 
+         elev.desc.tot.ft, 
+         pace.elapsed, 
+         pace.time, 
+         cut.elapsed, 
+         cut.time, 
+         `Cut-off`, 
+         `Crew Access`, 
+         Services)
+```
+
+
+```{r}
+write_csv(out, file = "../data/utmb_puerto-vallarta100/2022_utmbpv_pace-chart.csv")
 ```
 
