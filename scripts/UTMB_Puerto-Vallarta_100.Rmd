@@ -27,11 +27,11 @@ Convert distances and elevations.
 ```{r}
 xc <- 
   x %>%
-  mutate(altitude.feet = `Altitude meters` * 3.28084,
-         distance.int.mi = `Distance Interval km` * 0.621371,
-         total.dist.mi = `Total Distance km` * 0.621371,
-         elev.gain.tot.ft = Elevation...5 * 3.28084,
-         elev.desc.tot.ft = Elevation...6 * 3.28084)
+  mutate(altitude.feet = round(`Altitude meters` * 3.28084, 0),
+         distance.int.mi = round(`Distance Interval km` * 0.621371, 1),
+         total.dist.mi = round(`Total Distance km` * 0.621371, 1),
+         elev.gain.tot.ft = round(Elevation...5 * 3.28084, 0),
+         elev.desc.tot.ft = round(Elevation...6 * 3.28084, 0))
 
 summary(xc)
 ```
