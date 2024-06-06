@@ -88,7 +88,7 @@ res <- read.csv("../data/mohican100/mohican100_2018_results.csv", stringsAsFacto
   filter(distance == 100) %>%
   mutate(time = hms(time)) %>%
   drop_na(time)
-  
+
 typical.percentile <- 0.75
 
 time <- nrow(res) * typical.percentile
@@ -96,6 +96,15 @@ time <- nrow(res) * typical.percentile
 mytime <- res$time[time]
 mytime
 ```
+
+This year (2024) I'd like to be a bit more aspirational -- going for a 24 hr pace.
+
+```{r}
+
+mytime <- hms("24:00:00")
+mytime
+```
+
 
 Now I'll add my estimated splits to the pacing chart. 
 
