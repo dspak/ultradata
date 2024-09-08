@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(rvest)
 library(lubridate)
 library(dplyr)
+library(readxl)
+library(tidyverse)
 ```
 
 First I'll read in the previous year's results and format the columns.
@@ -86,6 +88,9 @@ time_at_aid <- function(start.time, aid.locations, min.mile) {
   return(out)
 }
 
+time_at_aid(start.time = start.time,
+            aid.locations = x$`Total Mileage`,
+            min.mile = 17.66)
 ```
 
 
@@ -200,4 +205,61 @@ write.csv(x = x,
           row.names = FALSE,
 )
 ```
+
+```{r}
+x <- readxl::read_xlsx("../data/grindstone100/2024_Grinstone100_aid_pacing.xlsx")
+
+header <- c("#", "Aid Station Name", "Total Mileage", "Seg Distance", "Elev. Gain (ft)", "Elev. Loss (ft)", "Cumul. Gain (ft)", "Cumul. Loss (ft)", "Cut-off time",  "Drop Bags", "Crew Access")
+
+names(x) <- header
+
+
+start.time <- as.POSIXct("2024-09-20 18:00", tz = "EST", format = "%F %R")
+
+time_at_aid <- function(start.time, aid.locations, min.mile) {
+  duration <- aid.locations * min.mile
+  secs <- round(duration * 60, 0)
+  out <- format(start.time + secs, "%H:%M")
+  return(out)
+}
+```
+
+
+
+```{r}
+y <- 
+  x |> 
+  mutate("28hr-pace" = time_at_aid(start.time = start.time,
+                                   aid.locations = x$`Total Mileage`,
+                                   min.mile = 16.16),
+         "30hr-pace" = time_at_aid(start.time = start.time,
+                                   aid.locations = x$`Total Mileage`,
+                                   min.mile = 17.31),
+         "32hr-pace" = time_at_aid(start.time = start.time,
+                                   aid.locations = x$`Total Mileage`,
+                                   min.mile = 18.47),
+         "Cut-pace" = time_at_aid(start.time = start.time,
+                                   aid.locations = x$`Total Mileage`,
+                                   min.mile = 20.77))
+
+```
+
+
+```{r}
+out <- 
+  y %>%
+  select("#", "Aid Station Name", "Total Mileage", "Seg Distance", "Elev. Gain (ft)", "Elev. Loss (ft)",  "28hr-pace", "30hr-pace", "32hr-pace", "Cut-pace", "Drop Bags", "Crew Access")
+
+
+write.csv(x = out, 
+          file = file.path("..", "data", "grindstone100", 
+                           paste0(format(Sys.Date(), "%Y"), 
+                                  "_grindstone-pacing.csv")
+          ),
+          row.names = FALSE
+)
+
+```
+
+
 
